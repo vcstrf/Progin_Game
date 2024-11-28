@@ -1,17 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 public class Movement : MonoBehaviour
 {
-    /*public Animator animator;*/
-
     public float walkSpeed;
     public float jumpSpeed;
-
     public float crouchSpeedModifier = 0.5f;
     public float sprintSpeedModifier = 1.7f;
 
@@ -22,8 +16,9 @@ public class Movement : MonoBehaviour
     [SerializeField] Transform overheadCheckCollider;
     [SerializeField] bool StartFacingLeft;
     [SerializeField] bool CutsceneNeeded;
-
-    const float overheadCheckRadius = 0.2f;
+    [SerializeField] float overheadCheckRadius = 0.2f;
+    [SerializeField] private int airJumpCounter = 0;
+    [SerializeField] private int maxAirJumps;
 
     public Rigidbody2D body;
     public Collider2D groundCheck;
@@ -54,17 +49,27 @@ public class Movement : MonoBehaviour
     void GetInput()
     {
         xInput = Input.GetAxis("Horizontal");
-        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space)) && isGrounded)
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            /*animator.SetBool("isJumping", true);*/
-            Jump();
+            if (isGrounded)
+            {
+                Jump();
+                airJumpCounter = 0; 
+            }
+            else if (airJumpCounter < maxAirJumps)
+            {
+                Jump();
+                airJumpCounter++; 
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
             isCrouching = true;
         }
-        else if (Input.GetKeyUp(KeyCode.S))
+
+        if (Input.GetKeyUp(KeyCode.S) && !Physics2D.OverlapCircle(overheadCheckCollider.position, overheadCheckRadius, groundMask))
         {
             isCrouching = false;
         }
@@ -115,16 +120,20 @@ public class Movement : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 0);
             facingRight = true;
         }
-
-        /*animator.SetFloat("xVelocity", Mathf.Abs(body.velocity.x));*/
     }
 
     void CheckGround()
     {
         isGrounded = Physics2D.OverlapAreaAll(groundCheck.bounds.min, groundCheck.bounds.max, groundMask).Length > 0;
-        /*animator.SetBool("isJumping", !isGrounded);*/
+
+        if (isGrounded)
+        {
+            airJumpCounter = 0; 
+        }
+
         ApplyFriction();
     }
+
     void ApplyFriction()
     {
         if (isGrounded)
@@ -136,43 +145,29 @@ public class Movement : MonoBehaviour
             body.sharedMaterial = zeroFrictionMaterial;
         }
     }
-    void Crouch(bool isCrouching)
+
+    void CheckCrouchState()
     {
-        if (isCrouching)
+        bool isObstacleOverhead = Physics2D.Raycast(overheadCheckCollider.position, Vector2.up, overheadCheckRadius, groundMask);
+        if (isGrounded)
         {
-            if (Physics2D.OverlapCircle(overheadCheckCollider.position, overheadCheckRadius, groundMask))
+            if (!Input.GetKey(KeyCode.S) && !isObstacleOverhead)
             {
-                standingCollider.enabled = false; 
+                isCrouching = false;
+                standingCollider.enabled = true;
             }
-            else
+            else if (Input.GetKey(KeyCode.S) || isObstacleOverhead)
             {
-                standingCollider.enabled = true; 
+                isCrouching = true;
+                standingCollider.enabled = false;
             }
         }
-        else
-        {
-            standingCollider.enabled = true;
-        }
-        /*animator.SetBool("isCrouching", isCrouching);*/
-    }
-
-
-    public void SetSpeed(float newSpeed, float newJump)
-    {
-        walkSpeed = newSpeed;
-        jumpSpeed = newJump;
-    }
-
-    public void ResetSpeed()
-    {
-        walkSpeed = 2.5f;
-        jumpSpeed = 20f;
     }
 
     void FixedUpdate()
     {
         CheckGround();
         MoveWithInput();
-        Crouch(isCrouching);
+        CheckCrouchState();
     }
 }
