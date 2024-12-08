@@ -17,8 +17,7 @@ public class Movement : MonoBehaviour
     [SerializeField] bool StartFacingLeft;
     [SerializeField] bool CutsceneNeeded;
     [SerializeField] float overheadCheckRadius = 0.2f;
-    [SerializeField] private int airJumpCounter = 0;
-    [SerializeField] private int maxAirJumps;
+    [SerializeField] private bool canDoubleJump;
 
     public Rigidbody2D body;
     public Collider2D groundCheck;
@@ -46,21 +45,26 @@ public class Movement : MonoBehaviour
         body.velocity = new Vector2(body.velocity.x, jumpSpeed);
     }
 
-    void GetInput()
+    void MoveWithInput()
     {
         xInput = Input.GetAxis("Horizontal");
+
+        if (isGrounded)
+        {
+            canDoubleJump = true;
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (isGrounded)
             {
+                canDoubleJump = true;
                 Jump();
-                airJumpCounter = 0; 
             }
-            else if (airJumpCounter < maxAirJumps)
+            else if (canDoubleJump)
             {
+                canDoubleJump = false;
                 Jump();
-                airJumpCounter++; 
             }
         }
 
@@ -82,15 +86,7 @@ public class Movement : MonoBehaviour
         {
             isSprinting = false;
         }
-    }
 
-    void Update()
-    {
-        GetInput();
-    }
-
-    void MoveWithInput()
-    {
         if (isGrounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W)))
         {
             body.velocity = new Vector2(body.velocity.x, jumpSpeed);
@@ -110,6 +106,19 @@ public class Movement : MonoBehaviour
 
         body.velocity = new Vector2(xVal, body.velocity.y);
 
+        Flip();
+    }
+
+    void CheckGround()
+    {
+        isGrounded = Physics2D.OverlapAreaAll(groundCheck.bounds.min, groundCheck.bounds.max, groundMask).Length > 0;
+
+        ApplyFriction();
+
+    }
+
+    void Flip()
+    {
         if (facingRight && xInput < 0)
         {
             transform.rotation = Quaternion.Euler(0, 180, 0);
@@ -120,18 +129,6 @@ public class Movement : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 0);
             facingRight = true;
         }
-    }
-
-    void CheckGround()
-    {
-        isGrounded = Physics2D.OverlapAreaAll(groundCheck.bounds.min, groundCheck.bounds.max, groundMask).Length > 0;
-
-        if (isGrounded)
-        {
-            airJumpCounter = 0; 
-        }
-
-        ApplyFriction();
     }
 
     void ApplyFriction()
