@@ -107,8 +107,6 @@ public class Movement : MonoBehaviour
         {
             StartCoroutine(Dash());
         }
-        Debug.Log(body.velocity.x);
-
     }
 
     void MoveWithInput()

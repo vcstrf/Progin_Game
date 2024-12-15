@@ -27,15 +27,10 @@ public class HealthManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        health = 3;
-    }
-
     private void Update()
     {
-
         UpdateHearts();
+        Debug.Log(health);
 
         if (health <= 0)
         {
@@ -45,7 +40,6 @@ public class HealthManager : MonoBehaviour
 
     private void UpdateHearts()
     {
-
         foreach (Image img in hearts)
         {
             img.sprite = emptyHeart;
@@ -62,26 +56,8 @@ public class HealthManager : MonoBehaviour
 
     private void RespawnPlayer()
     {
-
         health = 3;
-
         string currentSceneName = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentSceneName);
-
-        StartCoroutine(SetPlayerToSpawnPosition());
-    }
-
-    private IEnumerator SetPlayerToSpawnPosition()
-    {
-        yield return new WaitForEndOfFrame(); 
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            if (SaveManager.Instance != null)
-            {
-                player.transform.position = SaveManager.Instance.GetSpawnPosition();
-            }
-        }
     }
 }
