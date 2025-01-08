@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class Sword : MonoBehaviour
 {
+    [SerializeField] private GameObject sword;
     [SerializeField] private float timeBetweenAttack = 0.15f;
     [SerializeField] private Transform attackPos;
     [SerializeField] private LayerMask attackableLayer;
@@ -32,27 +33,32 @@ public class Sword : MonoBehaviour
 
     public IEnumerator DamageWhileSlashIsActive()
     {
-        ShouldBeDamaging = true;
+        if (sword.activeInHierarchy)
+        {
+            ShouldBeDamaging = true;
 
-        while (ShouldBeDamaging) 
-        { 
-            hits = Physics2D.CircleCastAll(attackPos.position, attackRange, transform.right, 0f, attackableLayer);
-
-            for (int i = 0; i < hits.Length; i++)
+            while (ShouldBeDamaging)
             {
-                IDamageable iDamageable = hits[i].collider.gameObject.GetComponent<IDamageable>();
+                hits = Physics2D.CircleCastAll(attackPos.position, attackRange, transform.right, 0f, attackableLayer);
 
-                if (iDamageable != null && !iDamageable.HasTakenDamage)
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    iDamageable.Damage(damage);
-                    iDamageables.Add(iDamageable);
+                    IDamageable iDamageable = hits[i].collider.gameObject.GetComponent<IDamageable>();
+
+                    if (iDamageable != null && !iDamageable.HasTakenDamage)
+                    {
+                        Debug.Log("Sword hit damageable object.");
+                        iDamageable.Damage(damage);
+                        iDamageable.HasTakenDamage = true;
+                        iDamageables.Add(iDamageable);
+                    }
                 }
+
+                yield return null;
             }
 
-            yield return null;
+            ReturnAttackablesToDamageable();
         }
-
-        ReturnAttackablesToDamageable();
     }
 
     private void ReturnAttackablesToDamageable()
@@ -60,6 +66,7 @@ public class Sword : MonoBehaviour
         foreach (IDamageable thingThatWasDamaged in iDamageables)
         {
             thingThatWasDamaged.HasTakenDamage = false;
+            Debug.Log("Reset HasTakenDamage for: " + thingThatWasDamaged);
         }
 
         iDamageables.Clear();
@@ -68,7 +75,7 @@ public class Sword : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPos.position, attackRange); 
+        Gizmos.DrawWireSphere(attackPos.position, attackRange);
     }
 
     public void ShouldBeDamagingToTrue()

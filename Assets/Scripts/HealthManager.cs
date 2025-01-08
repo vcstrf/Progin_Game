@@ -30,7 +30,6 @@ public class HealthManager : MonoBehaviour
     private void Update()
     {
         UpdateHearts();
-        Debug.Log(health);
 
         if (health <= 0)
         {
