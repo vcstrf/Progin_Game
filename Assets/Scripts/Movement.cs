@@ -18,8 +18,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private float dashingTime = 0.2f;
     [SerializeField] private float dashingCooldown = 0.7f;
 
-    [SerializeField] Collider2D standingCollider;
-    [SerializeField] Transform overheadCheckCollider;
+/*    [SerializeField] Collider2D standingCollider;
+    [SerializeField] Transform overheadCheckCollider;*/
     [SerializeField] bool StartFacingLeft;
     [SerializeField] bool CutsceneNeeded;
     [SerializeField] float overheadCheckRadius = 0.2f;
@@ -53,7 +53,7 @@ public class Movement : MonoBehaviour
         GetInput();
         CheckGround();
         MoveWithInput();
-        CheckCrouchState();
+/*        CheckCrouchState();*/
     }
 
     void Jump()
@@ -84,7 +84,7 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
+/*        if (Input.GetKeyDown(KeyCode.S))
         {
             isCrouching = true;
         }
@@ -92,7 +92,7 @@ public class Movement : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.S) && !Physics2D.OverlapCircle(overheadCheckCollider.position, overheadCheckRadius, groundMask))
         {
             isCrouching = false;
-        }
+        }*/
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -167,7 +167,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    void CheckCrouchState()
+/*    void CheckCrouchState()
     {
         bool isObstacleOverhead = Physics2D.Raycast(overheadCheckCollider.position, Vector2.up, overheadCheckRadius, groundMask);
         if (isGrounded)
@@ -183,7 +183,7 @@ public class Movement : MonoBehaviour
                 standingCollider.enabled = false;
             }
         }
-    }
+    }*/
 
     private IEnumerator Dash()
     {
