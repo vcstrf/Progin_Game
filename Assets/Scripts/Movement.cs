@@ -53,7 +53,8 @@ public class Movement : MonoBehaviour
         GetInput();
         CheckGround();
         MoveWithInput();
-/*        CheckCrouchState();*/
+        /*        CheckCrouchState();*/
+        Suicide();
     }
 
     void Jump()
@@ -185,6 +186,17 @@ public class Movement : MonoBehaviour
         }
     }*/
 
+    void Suicide()
+    {
+        bool d1 = (Input.GetKey(KeyCode.LeftAlt) ? true : false);
+        bool d2 = (Input.GetKey(KeyCode.F) ? true : false);
+
+        if (d1 && d2)
+        {
+            HealthManager.health = 0;
+        }
+    }
+
     private IEnumerator Dash()
     {
         canDash = false;
@@ -200,4 +212,17 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
     }
+
+    public void SetSpeed(float newSpeed, float newJump)
+    {
+        walkSpeed = newSpeed;
+        jumpSpeed = newJump;
+    }
+
+    public void ResetSpeed()
+    {
+        walkSpeed = 3f;
+        jumpSpeed = 7f;
+    }
+
 }
