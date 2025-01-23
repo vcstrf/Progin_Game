@@ -166,5 +166,6 @@ MonoBehaviour:
   whatDestroysBullet:
     serializedVersion: 2
     m_Bits: 136
-  bulletDamage: 1
+  bulletDamage: 2
   bulletEffect: {fileID: 2719949230940363686, guid: 4fd3a549eb542bd4c937dc52d1d89b0c, type: 3}
+  particleDestroyTime: 1

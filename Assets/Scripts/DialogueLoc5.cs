@@ -1,25 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using System.Xml.Serialization;
+using UnityEngine;
 
-public class Dialogue : MonoBehaviour
+public class DialogueLoc5 : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textComponent;
     [SerializeField] private string[] lines;
     [SerializeField] private float textSpeed;
     [SerializeField] private Movement movement;
-    [SerializeField] private GameObject health;
-    [SerializeField] private GameObject detail;
-    [SerializeField] private GameObject cldr;
 
     private int index;
 
     void Start()
     {
         textComponent.text = string.Empty;
-        detail.SetActive(false);
     }
 
     private void Update()
@@ -47,7 +42,7 @@ public class Dialogue : MonoBehaviour
 
     IEnumerator TypeLine()
     {
-        foreach (char c in lines[index].ToCharArray()) 
+        foreach (char c in lines[index].ToCharArray())
         {
             textComponent.text += c;
             yield return new WaitForSeconds(textSpeed);
@@ -67,9 +62,6 @@ public class Dialogue : MonoBehaviour
         {
             gameObject.SetActive(false);
             movement.ResetSpeed();
-            health.SetActive(true);
-            detail.SetActive(true);
-            cldr.SetActive(true);
         }
     }
 }
